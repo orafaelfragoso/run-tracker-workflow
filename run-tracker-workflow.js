@@ -1,7 +1,8 @@
 const fs = require('fs')
+const { resolve } = require('path')
 const fetch = require('node-fetch')
 const core = require('@actions/core')
-const { Octokit } = require('@octokit/core')
+// const { Octokit } = require('@octokit/core')
 
 const {
   RUNNING_GOAL,
@@ -10,16 +11,16 @@ const {
   STRAVA_CLIENT_SECRET,
   STRAVA_REFRESH_TOKEN,
   STRAVA_USER_ID,
-  GITHUB_TOKEN,
-  GITHUB_REPOSITORY,
+  // GITHUB_TOKEN,
+  // GITHUB_REPOSITORY,
 } = process.env
 
 const goal = RUNNING_GOAL * 1000
-const cacheFile = 'auth.json'
+const cacheFile = resolve('../auth.json')
 const apiBase = 'https://www.strava.com/'
-const octokit = new Octokit({ auth: GITHUB_TOKEN })
-const owner = GITHUB_REPOSITORY.split('/')[0]
-const repo = GITHUB_REPOSITORY.split('/')[1]
+// const octokit = new Octokit({ auth: GITHUB_TOKEN })
+// const owner = GITHUB_REPOSITORY.split('/')[0]
+// const repo = GITHUB_REPOSITORY.split('/')[1]
 
 function time(minutes) {
   return `${(minutes / 3600).toFixed(2)}h`
@@ -99,6 +100,7 @@ async function getStravaToken() {
   }
 
   try {
+    console.log('Reading file: ', cacheFile)
     const jsonStr = fs.readFileSync(cacheFile)
     const c = JSON.parse(jsonStr)
 
@@ -106,7 +108,7 @@ async function getStravaToken() {
       cache[key] = c[key]
     })
   } catch (error) {
-    console.log(error.message)
+    console.log('Failed: ', error.message)
   }
 
   const data = await fetch(`${apiBase}oauth/token`, {
@@ -118,7 +120,9 @@ async function getStravaToken() {
       refresh_token: cache.stravaRefreshToken,
     }),
     headers: { 'Content-Type': 'application/json' },
-  }).then((res) => res.json())
+  })
+    .then((res) => res.json())
+    .catch((err) => core.setFailed(err.message))
 
   cache.stravaAccessToken = data.access_token
   cache.stravaRefreshToken = data.refresh_token
@@ -140,8 +144,8 @@ async function getStravaStats() {
 async function main() {
   const stats = await getStravaStats()
   await updateReadme()
-  const widget = `Running   ${stats.distance}/120km   ${stats.chart}   ${stats.goal}%`
-  console.log(widget)
+  // const widget = `Running   ${stats.distance}/120km   ${stats.chart}   ${stats.goal}%`
+  // console.log(widget)
 }
 
 ;(async () => {
