@@ -99,6 +99,7 @@ async function getStravaToken() {
   }
 
   try {
+    console.debug(`Trying to access file: ${cacheFile}`)
     const jsonStr = fs.readFileSync(cacheFile)
     const c = JSON.parse(jsonStr)
     Object.keys(c).forEach((key) => {
