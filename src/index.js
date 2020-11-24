@@ -21,7 +21,7 @@ const {
 } = process.env
 
 const goal = RUNNING_GOAL * 1000
-const cacheFile = '../auth.json'
+const cacheFile = 'auth.json'
 const apiBase = 'https://www.strava.com/'
 const octokit = new Octokit({ auth: GITHUB_TOKEN })
 const owner = GITHUB_REPOSITORY.split('/')[0]
