@@ -1,5 +1,4 @@
 const fs = require('fs')
-const { resolve } = require('path')
 const fetch = require('node-fetch')
 const core = require('@actions/core')
 // const { Octokit } = require('@octokit/core')
@@ -16,7 +15,7 @@ const {
 } = process.env
 
 const goal = RUNNING_GOAL * 1000
-const cacheFile = resolve('auth.json')
+const cacheFile = 'auth.json'
 const apiBase = 'https://www.strava.com/'
 // const octokit = new Octokit({ auth: GITHUB_TOKEN })
 // const owner = GITHUB_REPOSITORY.split('/')[0]
@@ -95,6 +94,7 @@ async function updateReadme() {
 
 async function getStravaToken() {
   const cache = {
+    stravaAccessToken: STRAVA_ACCESS_TOKEN,
     stravaRefreshToken: STRAVA_REFRESH_TOKEN,
   }
 
