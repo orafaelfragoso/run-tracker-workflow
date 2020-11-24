@@ -21,7 +21,7 @@ const {
 } = process.env
 
 const goal = RUNNING_GOAL * 1000
-const cacheFile = './../auth.json'
+const cacheFile = '../auth.json'
 const apiBase = 'https://www.strava.com/'
 const octokit = new Octokit({ auth: GITHUB_TOKEN })
 const owner = GITHUB_REPOSITORY.split('/')[0]
@@ -83,24 +83,24 @@ async function getStravaToken() {
     Object.keys(c).forEach((key) => {
       cache[key] = c[key]
     })
-
-    const data = await fetch(`${apiBase}oauth/token`, {
-      method: 'post',
-      body: JSON.stringify({
-        grant_type: 'refresh_token',
-        client_id: STRAVA_CLIENT_ID,
-        client_secret: STRAVA_CLIENT_SECRET,
-        refresh_token: cache.stravaRefreshToken,
-      }),
-      headers: { 'Content-Type': 'application/json' },
-    }).then((res) => res.json())
-    cache.stravaAccessToken = data.access_token
-    cache.stravaRefreshToken = data.refresh_token
-
-    fs.writeFileSync(cacheFile, JSON.stringify(cache))
   } catch (error) {
-    core.setFailed(error.message)
+    console.error(error.message)
   }
+
+  const data = await fetch(`${apiBase}oauth/token`, {
+    method: 'post',
+    body: JSON.stringify({
+      grant_type: 'refresh_token',
+      client_id: STRAVA_CLIENT_ID,
+      client_secret: STRAVA_CLIENT_SECRET,
+      refresh_token: cache.stravaRefreshToken,
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  }).then((res) => res.json())
+  cache.stravaAccessToken = data.access_token
+  cache.stravaRefreshToken = data.refresh_token
+
+  fs.writeFileSync(cacheFile, JSON.stringify(cache))
 
   return cache.stravaAccessToken
 }
