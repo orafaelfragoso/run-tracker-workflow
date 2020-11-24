@@ -5,6 +5,10 @@ inputs:
     description: 'Path of your README.md file.'
     required: false
     default: 'README.md'
+  credentials:
+    description: 'Path of your auth.json file.'
+    required: false
+    default: 'auth.json'
 runs:
   using: 'node12'
   main: 'dist/run-tracker-workflow.js'
