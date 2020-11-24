@@ -3,12 +3,6 @@ const fetch = require('node-fetch')
 const core = require('@actions/core')
 const { Octokit } = require('@octokit/core')
 
-const generateBarChart = require('./chart')
-const pace = require('./pace')
-const distance = require('./distance')
-const goalPercentage = require('./goal')
-const time = require('./time')
-
 const {
   RUNNING_GOAL,
   STRAVA_ACCESS_TOKEN,
@@ -26,6 +20,42 @@ const apiBase = 'https://www.strava.com/'
 const octokit = new Octokit({ auth: GITHUB_TOKEN })
 const owner = GITHUB_REPOSITORY.split('/')[0]
 const repo = GITHUB_REPOSITORY.split('/')[1]
+
+function time(minutes) {
+  return `${(minutes / 3600).toFixed(2)}h`
+}
+
+function goalPercentage(current, total) {
+  return parseFloat(((current / total) * 100).toFixed(2))
+}
+
+function generateBarChart(percent, size) {
+  const syms = '░▏▎▍▌▋▊▉█'
+
+  const frac = Math.floor((size * 8 * percent) / 100)
+  const barsFull = Math.floor(frac / 8)
+
+  if (barsFull >= size) {
+    return syms.substring(8, 9).repeat(size)
+  }
+
+  const semi = frac % 8
+
+  return [syms.substring(8, 9).repeat(barsFull), syms.substring(semi, semi + 1)]
+    .join('')
+    .padEnd(size, syms.substring(0, 1))
+}
+
+function distance(meters) {
+  return (meters * 0.001).toFixed(2)
+}
+
+function pace(d, movingTime) {
+  const pacePH = distance((d * 3600) / (movingTime || 1))
+  const p = pacePH.substring(0, pacePH.length - 3)
+
+  return `${p}/h`
+}
 
 function transformData(exercise) {
   const percentage = goalPercentage(exercise.distance, goal)
