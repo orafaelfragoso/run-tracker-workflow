@@ -7,4 +7,4 @@ inputs:
     default: 'README.md'
 runs:
   using: 'node12'
-  main: 'index.js'
+  main: 'dist/run-tracker-workflow.js'

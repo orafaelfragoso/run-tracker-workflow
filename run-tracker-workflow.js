@@ -74,19 +74,9 @@ function transformData(exercise) {
 async function updateReadme() {
   try {
     const path = core.getInput('path')
-    const getReadme = await octokit
-      .request('GET /repos/{owner}/{repo}/contents/{path}', {
-        owner,
-        repo,
-        path,
-      })
-      .catch((e) => {
-        console.error('Failed: ', e)
-        core.setFailed('Failed: ', e.message)
-      })
-    // const { sha } = getReadme.data
+    const readme = fs.readFileSync(path, 'utf8')
 
-    console.log('README: ', getReadme)
+    console.log('README: ', readme)
     // const data = core.getInput('customReadmeFile')
 
     // await octokit.request('PUT /repos/{owner}/{repo}/contents/{path}', {
