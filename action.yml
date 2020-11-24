@@ -1,0 +1,10 @@
+name: 'run-tracker'
+description: 'Update your profile README.md to show your run activity.'
+inputs:
+  path:
+    description: 'Path of your README.md file.'
+    required: false
+    default: 'README.md'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
