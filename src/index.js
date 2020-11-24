@@ -50,7 +50,10 @@ async function updateReadme() {
         repo,
         path,
       })
-      .catch((err) => core.setFailed(err.message))
+      .catch((e) => {
+        console.error('Failed: ', e)
+        core.setFailed('Failed: ', e.message)
+      })
     // const { sha } = getReadme.data
 
     console.log('README: ', getReadme)
@@ -95,9 +98,8 @@ async function getStravaToken() {
       refresh_token: cache.stravaRefreshToken,
     }),
     headers: { 'Content-Type': 'application/json' },
-  })
-    .then((res) => res.json())
-    .catch((err) => core.setFailed(err.message))
+  }).then((res) => res.json())
+
   cache.stravaAccessToken = data.access_token
   cache.stravaRefreshToken = data.refresh_token
 
@@ -122,4 +124,6 @@ async function main() {
   console.log(widget)
 }
 
-main()
+;(async () => {
+  await main()
+})()
