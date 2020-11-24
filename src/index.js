@@ -44,14 +44,13 @@ function transformData(exercise) {
 async function updateReadme() {
   try {
     const path = core.getInput('path')
-    const getReadme = await octokit.request(
-      'GET /repos/{owner}/{repo}/contents/{path}',
-      {
+    const getReadme = await octokit
+      .request('GET /repos/{owner}/{repo}/contents/{path}', {
         owner,
         repo,
         path,
-      },
-    )
+      })
+      .catch((err) => core.setFailed(err.message))
     // const { sha } = getReadme.data
 
     console.log('README: ', getReadme)
@@ -84,7 +83,7 @@ async function getStravaToken() {
       cache[key] = c[key]
     })
   } catch (error) {
-    console.error(error.message)
+    console.log(error.message)
   }
 
   const data = await fetch(`${apiBase}oauth/token`, {
@@ -96,7 +95,9 @@ async function getStravaToken() {
       refresh_token: cache.stravaRefreshToken,
     }),
     headers: { 'Content-Type': 'application/json' },
-  }).then((res) => res.json())
+  })
+    .then((res) => res.json())
+    .catch((err) => core.setFailed(err.message))
   cache.stravaAccessToken = data.access_token
   cache.stravaRefreshToken = data.refresh_token
 
@@ -108,7 +109,9 @@ async function getStravaToken() {
 async function getStravaStats() {
   const API = `${apiBase}api/v3/athletes/${STRAVA_USER_ID}/stats?access_token=${await getStravaToken()}`
 
-  const json = await fetch(API).then((data) => data.json())
+  const json = await fetch(API)
+    .then((data) => data.json())
+    .catch((err) => core.setFailed(err.message))
   return transformData(json.ytd_run_totals)
 }
 
