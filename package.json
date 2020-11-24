@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "parcel build src/index.js --target node --bundle-node-modules -d dist/index.js"
+    "build": "parcel build src/index.js --target node --bundle-node-modules -d dist"
   },
   "dependencies": {
     "@actions/core": "^1.2.6",
