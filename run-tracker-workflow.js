@@ -102,32 +102,34 @@ async function getStravaToken() {
   try {
     console.log('Reading file: ', cacheFile)
     const jsonStr = fs.readFileSync(cacheFile)
-    const c = JSON.parse(jsonStr)
+    if (jsonStr) {
+      const c = JSON.parse(jsonStr)
 
-    Object.keys(c).forEach((key) => {
-      cache[key] = c[key]
+      Object.keys(c).forEach((key) => {
+        cache[key] = c[key]
+      })
+    }
+
+    const data = await fetch(`${apiBase}oauth/token`, {
+      method: 'post',
+      body: JSON.stringify({
+        grant_type: 'refresh_token',
+        client_id: STRAVA_CLIENT_ID,
+        client_secret: STRAVA_CLIENT_SECRET,
+        refresh_token: cache.stravaRefreshToken,
+      }),
+      headers: { 'Content-Type': 'application/json' },
     })
+      .then((res) => res.json())
+      .catch((err) => core.setFailed(err.message))
+
+    cache.stravaAccessToken = data.access_token
+    cache.stravaRefreshToken = data.refresh_token
+
+    fs.writeFileSync(cacheFile, JSON.stringify(cache))
   } catch (error) {
     console.log('Failed: ', error.message)
   }
-
-  const data = await fetch(`${apiBase}oauth/token`, {
-    method: 'post',
-    body: JSON.stringify({
-      grant_type: 'refresh_token',
-      client_id: STRAVA_CLIENT_ID,
-      client_secret: STRAVA_CLIENT_SECRET,
-      refresh_token: cache.stravaRefreshToken,
-    }),
-    headers: { 'Content-Type': 'application/json' },
-  })
-    .then((res) => res.json())
-    .catch((err) => core.setFailed(err.message))
-
-  cache.stravaAccessToken = data.access_token
-  cache.stravaRefreshToken = data.refresh_token
-
-  fs.writeFileSync(cacheFile, JSON.stringify(cache))
 
   return cache.stravaAccessToken
 }
@@ -142,7 +144,7 @@ async function getStravaStats() {
 }
 
 async function main() {
-  const stats = await getStravaStats()
+  // const stats = await getStravaStats()
   await updateReadme()
   // const widget = `Running   ${stats.distance}/120km   ${stats.chart}   ${stats.goal}%`
   // console.log(widget)
