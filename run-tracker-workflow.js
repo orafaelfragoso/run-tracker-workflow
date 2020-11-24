@@ -144,10 +144,10 @@ async function getStravaStats() {
 }
 
 async function main() {
-  // const stats = await getStravaStats()
+  const stats = await getStravaStats()
   await updateReadme()
-  // const widget = `Running   ${stats.distance}/120km   ${stats.chart}   ${stats.goal}%`
-  // console.log(widget)
+  const widget = `Running   ${stats.distance}/120km   ${stats.chart}   ${stats.goal}%`
+  console.log(widget)
 }
 
 ;(async () => {
